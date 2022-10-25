@@ -1,0 +1,17 @@
+*.vsidx
+*.lock
+*.suo
+*.db
+*.db-shm
+*.db-wal
+*.opendb
+*.bin
+*.ipch
+ProjectSilence/Binaries/
+ProjectSilence/Intermediate/
+ProjectSilence/Saved/
+ProjectSilence/Build/
+ProjectSilence/DemoProject.sln
+ProjectSilence/Plugins/ModularLocomotionSystem/Intermediate/
+ProjectSilence/Plugins/ModularLocomotionSystem/Binaries/
+ProjectSilence/Plugins/ModularLocomotionSystem/Resources/
