@@ -109,6 +109,10 @@ void AMLSBaseCharacter::Tick(float DeltaTime)
 	// Cache values
 	PreviousVelocity = GetVelocity();
 	PreviousAimYaw = AimingRotation.Yaw;
+
+	FVector LineStart = GetActorLocation();
+	FVector LineEnd = LineStart + (GetControlRotation().Vector() * 100.0f);
+	DrawDebugDirectionalArrow(GetWorld(), LineStart, LineEnd, 100.f, FColor::Green, false, 0.f, 0, 5.0f);
 }
 
 void AMLSBaseCharacter::SetMovementState(const ECharacterMovementState NewState, bool bForce)
@@ -282,18 +286,8 @@ void AMLSBaseCharacter::SetVisibleMesh(USkeletalMesh* NewVisibleMesh)
 		const USkeletalMesh* Prev = VisibleMesh;
 		VisibleMesh = NewVisibleMesh;
 		OnVisibleMeshChanged(Prev);
-
-		/*if (GetLocalRole() != ROLE_Authority)
-		{
-			Server_SetVisibleMesh(NewVisibleMesh);
-		}*/
 	}
 }
-
-//void AMLSBaseCharacter::Server_SetVisibleMesh_Implementation(USkeletalMesh* NewVisibleMesh)
-//{
-//	SetVisibleMesh(NewVisibleMesh);
-//}
 
 void AMLSBaseCharacter::SetRightShoulder(bool bNewRightShoulder)
 {
@@ -453,22 +447,17 @@ void AMLSBaseCharacter::SetEssentialValues(float DeltaTime)
 {
 	CurrentAcceleration = GetCharacterMovement()->GetCurrentAcceleration();
 
-	// Reset the previous view mode. This is sused so that we can revert to using the camera rotation instead of controls rotation
+	FRotator PreviousControlRotation = ControlRotation;
+
+	// Reset the previous view mode. This is used so that we can revert to using the camera rotation instead of controls rotation
 	if ((float)CurrentAcceleration.Length() == 0.0f)
 	{
 		PreviousViewMode = ECharacterViewMode::Default;
 	}
 
-	if (PreviousViewMode != ECharacterViewMode::FixedCamera)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Not Fixed cam"));
-	}
-
 	if (ViewMode == ECharacterViewMode::FixedCamera && PreviousViewMode != ECharacterViewMode::Default)
 	{
 		ControlRotation = GetControlRotation();
-		//UE_LOG(LogTemp, Warning, TEXT("Using Control rotation"));
-
 	}
 	else if(ViewMode == ECharacterViewMode::FixedCamera)
 	{	
@@ -479,6 +468,7 @@ void AMLSBaseCharacter::SetEssentialValues(float DeltaTime)
 	{
 		ControlRotation = GetControlRotation();
 	}
+
 	EasedMaxAcceleration = GetCharacterMovement()->GetMaxAcceleration();
 
 	// Interp AimingRotation to current control rotation for smooth character rotation movement. Decrease InterpSpeed
@@ -492,6 +482,9 @@ void AMLSBaseCharacter::SetEssentialValues(float DeltaTime)
 	{
 		AimingRotation = FMath::RInterpTo(AimingRotation, ControlRotation, DeltaTime, 30);
 	}
+
+	ControlRotation = FMath::RInterpTo(PreviousControlRotation, ControlRotation, DeltaTime, 30);
+
 
 	// These values represent how the capsule is moving as well as how it wants to move, and therefore are essential
 	// for any data driven animation system. They are also used throughout the system for various functions,
@@ -562,7 +555,7 @@ void AMLSBaseCharacter::UpdateGroundedRotation(float DeltaTime)
 		else if (RotationMode == ECharacterRotationMode::LookingDirection || RotationMode == ECharacterRotationMode::CharacterDirection)
 		{
 			// Looking Direction Rotation
-			float YawValue;
+			float YawValue = 0.0f;
 			if (Gait == ECharacterGait::Walking || Gait == ECharacterGait::Running)
 			{
 				// Walking or Running..
@@ -574,7 +567,6 @@ void AMLSBaseCharacter::UpdateGroundedRotation(float DeltaTime)
 		else if (RotationMode == ECharacterRotationMode::Aiming)
 		{
 			const float ControlYaw = AimingRotation.Yaw;
-			GetActorForwardVector();
 			SmoothCharacterRotation({0.0f, ControlYaw, 0.0f}, 1000.0f, 20.0f, DeltaTime);
 		}
 	}
@@ -689,7 +681,7 @@ void AMLSBaseCharacter::ForwardMovementAction_Implementation(float Value)
 	if (MovementState == ECharacterMovementState::Grounded)
 	{
 		// Default camera relative movement behavior
-		const FRotator DirRotator(0.0f, AimingRotation.Yaw, 0.0f);
+		const FRotator DirRotator(0.0f, ControlRotation.Yaw, 0.0f);
 		AddMovementInput(UKismetMathLibrary::GetForwardVector(DirRotator), Value);
 	}
 }
@@ -699,7 +691,7 @@ void AMLSBaseCharacter::RightMovementAction_Implementation(float Value)
 	if (MovementState == ECharacterMovementState::Grounded)
 	{
 		// Default camera relative movement behavior
-		const FRotator DirRotator(0.0f, AimingRotation.Yaw, 0.0f);
+		const FRotator DirRotator(0.0f, ControlRotation.Yaw, 0.0f);
 		AddMovementInput(UKismetMathLibrary::GetRightVector(DirRotator), Value);
 	}
 }

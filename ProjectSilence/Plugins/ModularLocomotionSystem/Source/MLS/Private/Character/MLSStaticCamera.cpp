@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "Character/StaticCamera.h"
+#include "Character/MLSStaticCamera.h"
 
-AStaticCamera::AStaticCamera()
+AMLSStaticCamera::AMLSStaticCamera()
 {
 	bIsStaticCamera = true;
 }

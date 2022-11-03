@@ -1,4 +1,4 @@
-#include "Character/FixedCamera.h"
+#include "Character/MLSFixedCamera.h"
 #include "Character/MLSPlayerCameraManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -6,17 +6,17 @@
 #include "Components/BillBoardComponent.h"
 
 
-bool AFixedCamera::bAllCameraInactive = true;
+bool AMLSFixedCamera::bAllCameraInactive = true;
 
 // Sets default values
-AFixedCamera::AFixedCamera()
+AMLSFixedCamera::AMLSFixedCamera()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
 	SetActorTickEnabled(false);
 	
-	FixedCameraState = EFixedCameraState::InActive;
+	FixedCameraState = EMLSFixedCameraState::InActive;
 
 	bIsStaticCamera = false;
 
@@ -28,7 +28,7 @@ AFixedCamera::AFixedCamera()
 	bUseBoxToActivateOrDeactivate = false;
 }
 
-void AFixedCamera::PostActorCreated()
+void AMLSFixedCamera::PostActorCreated()
 {
 	Super::PostActorCreated();
 
@@ -38,7 +38,7 @@ void AFixedCamera::PostActorCreated()
 }
 
 // Called when the game starts or when spawned
-void AFixedCamera::BeginPlay()
+void AMLSFixedCamera::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -63,11 +63,11 @@ void AFixedCamera::BeginPlay()
 	PlayerCameraManager->AddFixedCamera(this);
 }
 
-void AFixedCamera::OnActivateBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AMLSFixedCamera::OnActivateBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	AMLSPlayerCameraManager* PlayerCameraManager = Cast<AMLSPlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0));
 	
-	AFixedCamera* CurrentlyActive = PlayerCameraManager->GetCurrentFixedCamera();
+	AMLSFixedCamera* CurrentlyActive = PlayerCameraManager->GetCurrentFixedCamera();
 
 	if (CurrentlyActive)
 	{
@@ -82,14 +82,14 @@ void AFixedCamera::OnActivateBoxBeginOverlap(UPrimitiveComponent* OverlappedComp
 	Activate(OtherActor);
 }
 
-void AFixedCamera::OnDeactivateBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AMLSFixedCamera::OnDeactivateBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	Deactivate();
 }
 
 
 // Called every frame
-void AFixedCamera::Tick(float DeltaTime)
+void AMLSFixedCamera::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
@@ -121,12 +121,12 @@ void AFixedCamera::Tick(float DeltaTime)
 	}
 }
 
-void AFixedCamera::SetState(EFixedCameraState NewState)
+void AMLSFixedCamera::SetState(EMLSFixedCameraState NewState)
 {
 	FixedCameraState = NewState;
 }
 
-void AFixedCamera::Activate(AActor* NewLookTarget)
+void AMLSFixedCamera::Activate(AActor* NewLookTarget)
 {
 	if(NewLookTarget)
 	LookTarget = NewLookTarget;
@@ -135,14 +135,14 @@ void AFixedCamera::Activate(AActor* NewLookTarget)
 
 	SetActorTickEnabled(true);
 
-	SetState(EFixedCameraState::Active);
+	SetState(EMLSFixedCameraState::Active);
 
 	bAllCameraInactive = false;
 
 	UE_LOG(LogTemp, Warning, TEXT("Camera Active"));
 }
 
-bool AFixedCamera::TraceToLookTarget(FHitResult& HitResultOut, const AActor* LookTargetIn) const
+bool AMLSFixedCamera::TraceToLookTarget(FHitResult& HitResultOut, const AActor* LookTargetIn) const
 {
 	TArray<AActor*> ActorsToIgnore;
 
@@ -155,7 +155,7 @@ bool AFixedCamera::TraceToLookTarget(FHitResult& HitResultOut, const AActor* Loo
 	return UKismetSystemLibrary::LineTraceSingle(this, FixedCamLoc, LookTargetLoc, ETraceTypeQuery::TraceTypeQuery3, false, ActorsToIgnore, EDrawDebugTrace::None, HitResultOut, true);
 }
 
-void AFixedCamera::Deactivate()
+void AMLSFixedCamera::Deactivate()
 {
 	LookTarget = nullptr;
 
@@ -163,7 +163,7 @@ void AFixedCamera::Deactivate()
 
 	SetActorTickEnabled(false);
 
-	SetState(EFixedCameraState::InActive);
+	SetState(EMLSFixedCameraState::InActive);
 
 	bAllCameraInactive = true;
 

@@ -7,7 +7,7 @@
 // forward declarations
 class UALSDebugComponent;
 class AMLSBaseCharacter;
-class AFixedCamera;
+class AMLSFixedCamera;
 class UMLSPlayerCameraBehavior;
 
 /**
@@ -32,11 +32,11 @@ public:
 	void DrawDebugTargets(FVector PivotTargetLocation);
 
 	UFUNCTION()
-	void AddFixedCamera(AFixedCamera* FixedCameraObject);
+	void AddFixedCamera(AMLSFixedCamera* FixedCameraObject);
 
 	bool GetClosestFixedCamera();
 	
-	AFixedCamera* GetCurrentFixedCamera() { return CurrentActiveFixedCamera; }
+	AMLSFixedCamera* GetCurrentFixedCamera() { return CurrentActiveFixedCamera; }
 
 	bool ActivateClosestFixedCamera(AActor* LookTarget);
 
@@ -88,13 +88,13 @@ private:
 	TObjectPtr<UALSDebugComponent> ALSDebugComponent = nullptr;
 
 	UPROPERTY()
-	TArray<AFixedCamera*> FixedCameras;
+	TArray<AMLSFixedCamera*> FixedCameras;
 
 	UPROPERTY()
-	AFixedCamera* CurrentActiveFixedCamera = nullptr;
+	AMLSFixedCamera* CurrentActiveFixedCamera = nullptr;
 	
 	UPROPERTY()
-	AFixedCamera* PreviousCam = nullptr;
+	AMLSFixedCamera* PreviousCam = nullptr;
 
 	UPROPERTY()
 	UMLSPlayerCameraBehavior* CameraAnimInst;

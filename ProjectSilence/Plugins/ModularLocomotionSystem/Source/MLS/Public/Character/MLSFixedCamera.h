@@ -2,12 +2,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "FixedCamera.generated.h"
+#include "MLSFixedCamera.generated.h"
 
 class UBillboardComponent;
 
 UENUM(BlueprintType)
-enum class EFixedCameraState : uint8
+enum class EMLSFixedCameraState : uint8
 {
 	InActive		UMETA(DisplayName = "InActive"),
 	Active			UMETA(DisplayName = "Active")
@@ -15,13 +15,13 @@ enum class EFixedCameraState : uint8
 
 
 UCLASS()
-class MLS_API AFixedCamera : public AActor
+class MLS_API AMLSFixedCamera : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AFixedCamera();
+	AMLSFixedCamera();
 	
 	virtual void PostActorCreated() override;
 
@@ -42,7 +42,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetState(EFixedCameraState NewState);
+	void SetState(EMLSFixedCameraState NewState);
 
 	void Activate(AActor* NewLookTarget);
 
@@ -55,7 +55,7 @@ public:
 	bool bIsActive = false;
 
 	UPROPERTY(VisibleAnywhere, Category = "MLS|FixedCamera")
-	EFixedCameraState FixedCameraState;
+	EMLSFixedCameraState FixedCameraState;
 	
 	UPROPERTY(VisibleAnywhere, Category = "MLS|FixedCamera")
 	bool bIsStaticCamera;

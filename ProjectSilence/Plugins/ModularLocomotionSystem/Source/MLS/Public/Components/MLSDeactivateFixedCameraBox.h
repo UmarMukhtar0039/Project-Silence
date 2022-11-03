@@ -3,19 +3,20 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/CameraCollisionBox.h"
-#include "ActivateFixedCameraBox.generated.h"
+#include "Components/MLSCameraCollisionBox.h"
+#include "MLSDeactivateFixedCameraBox.generated.h"
 
 /**
  * 
  */
+
 UCLASS(Blueprintable, ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
-class MLS_API UActivateFixedCameraBox : public UCameraCollisionBox
+class MLS_API UMLSDeactivateFixedCameraBox : public UMLSCameraCollisionBox
 {
 	GENERATED_BODY()
-
+	
 public:
-	UActivateFixedCameraBox();
+	UMLSDeactivateFixedCameraBox();
 
 protected:
 	// Called when the game starts

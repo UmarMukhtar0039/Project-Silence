@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Character/FixedCamera.h"
-#include "StaticCamera.generated.h"
+#include "Character/MLSFixedCamera.h"
+#include "MLSStaticCamera.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class MLS_API AStaticCamera : public AFixedCamera
+class MLS_API AMLSStaticCamera : public AMLSFixedCamera
 {
 	GENERATED_BODY()
 
 public:
 
-	AStaticCamera();
+	AMLSStaticCamera();
 
 };

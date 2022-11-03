@@ -1,17 +1,11 @@
-
-
-
-
 #include "Character/MLSPlayerCameraManager.h"
-
 
 #include "Character/MLSBaseCharacter.h"
 #include "Character/MLSPlayerController.h"
 #include "Character/Animation/MLSPlayerCameraBehavior.h"
 #include "Components/ALSDebugComponent.h"
-#include "Character/FixedCamera.h"
+#include "Character/MLSFixedCamera.h"
 #include "Library/MLSCharacterEnumLibrary.h"
-
 #include "Kismet/KismetMathLibrary.h"
 
 
@@ -87,7 +81,7 @@ float AMLSPlayerCameraManager::GetCameraBehaviorParam(FName CurveName) const
 	return 0.0f;
 }
 
-void AMLSPlayerCameraManager::AddFixedCamera(AFixedCamera* FixedCameraObject)
+void AMLSPlayerCameraManager::AddFixedCamera(AMLSFixedCamera* FixedCameraObject)
 {
 	check(FixedCameraObject);
 	FixedCameras.Add(FixedCameraObject);

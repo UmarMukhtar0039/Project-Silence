@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "Components/BoxComponent.h"
-#include "CameraCollisionBox.generated.h"
+#include "MLSCameraCollisionBox.generated.h"
 
 UCLASS(Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class MLS_API UCameraCollisionBox : public UBoxComponent
+class MLS_API UMLSCameraCollisionBox : public UBoxComponent
 {
 	GENERATED_BODY()
 
 public:	
 	// Sets default values for this component's properties
-	UCameraCollisionBox();
+	UMLSCameraCollisionBox();
 
 protected:
 	// Called when the game starts
