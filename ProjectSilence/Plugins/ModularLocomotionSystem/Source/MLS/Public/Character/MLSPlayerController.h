@@ -47,6 +47,9 @@ protected:
 
 	UFUNCTION()
 	void AimAction(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void ShootAction(const FInputActionValue& Value);
 
 	UFUNCTION()
 	void CameraTapAction(const FInputActionValue& Value);

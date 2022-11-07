@@ -1,7 +1,3 @@
-
-
-
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -126,4 +122,27 @@ enum class ECharacterSpawnType : uint8
 {
 	Location,
 	Attached
+};
+
+UENUM(BlueprintType)
+enum EPistolModel
+{
+	Pistol_M9				UMETA(DisplayName = "M9"),
+	Pistol_DesertEagle		UMETA(DisplayName = "DesertEagle")
+};
+
+UENUM(BlueprintType)
+enum class ECharacterCombatState : uint8
+{
+	NONE,
+
+	Ranged,
+	Melee,
+};
+
+UENUM(BlueprintType)
+enum class EWeaponType : uint8
+{
+	Pistol2H,
+	Rifle,
 };

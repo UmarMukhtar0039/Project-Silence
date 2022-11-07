@@ -1,10 +1,7 @@
-
-
-
-
 #include "Character/MLSCharacter.h"
 
 #include "Engine/StaticMesh.h"
+#include "Engine/SkeletalMesh.h"
 #include "AI/ALSAIController.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,20 +11,54 @@ AMLSCharacter::AMLSCharacter(const FObjectInitializer& ObjectInitializer)
 	HeldObjectRoot = CreateDefaultSubobject<USceneComponent>(TEXT("HeldObjectRoot"));
 	HeldObjectRoot->SetupAttachment(GetMesh());
 
-	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
-	SkeletalMesh->SetupAttachment(HeldObjectRoot);
+	HeldSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SkeletalMesh"));
+	HeldSkeletalMesh->SetupAttachment(HeldObjectRoot);
 
-	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
-	StaticMesh->SetupAttachment(HeldObjectRoot);
+	HeldStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMesh"));
+	HeldStaticMesh->SetupAttachment(HeldObjectRoot);
+
+	PistolSkeletalRoot = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PistolSkeletalRoot"));
+	PistolSkeletalRoot->SetupAttachment(RootComponent);
+
+	PistolAttachmentMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("PistolAttachmentMesh"));
+	PistolAttachmentMesh->SetupAttachment(RootComponent);
+	
+	PistolSkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("PistolSkeletalMesh"));
+	PistolSkeletalMesh->SetupAttachment(PistolSkeletalRoot);
 
 	AIControllerClass = AALSAIController::StaticClass();
 }
 
+void AMLSCharacter::EquipItem()
+{
+	Super::EquipItem();
+
+}
+
+void AMLSCharacter::EquipGunEventUpdateVisibility()
+{
+	if (OverlayState == ECharacterOverlayState::Pistol)
+	{
+		PistolSkeletalMesh->SetVisibility(false);
+	}
+
+	SkeletaMeshObject->SetVisibility(true);
+}
+
+void AMLSCharacter::HolsterGunEventUpdateVisibility()
+{
+	SkeletaMeshObject->SetVisibility(false);
+	PistolSkeletalMesh->SetVisibility(true);
+
+	UpdateHeldObject();
+}
+
+
 void AMLSCharacter::ClearHeldObject()
 {
-	StaticMesh->SetStaticMesh(nullptr);
-	SkeletalMesh->SetSkeletalMesh(nullptr);
-	SkeletalMesh->SetAnimInstanceClass(nullptr);
+	HeldStaticMesh->SetStaticMesh(nullptr);
+	HeldSkeletalMesh->SetSkeletalMesh(nullptr);
+	HeldSkeletalMesh->SetAnimInstanceClass(nullptr);
 }
 
 void AMLSCharacter::AttachToHand(UStaticMesh* NewStaticMesh, USkeletalMesh* NewSkeletalMesh, UClass* NewAnimClass,
@@ -37,14 +68,14 @@ void AMLSCharacter::AttachToHand(UStaticMesh* NewStaticMesh, USkeletalMesh* NewS
 
 	if (IsValid(NewStaticMesh))
 	{
-		StaticMesh->SetStaticMesh(NewStaticMesh);
+		HeldStaticMesh->SetStaticMesh(NewStaticMesh);
 	}
 	else if (IsValid(NewSkeletalMesh))
 	{
-		SkeletalMesh->SetSkeletalMesh(NewSkeletalMesh);
+		HeldSkeletalMesh->SetSkeletalMesh(NewSkeletalMesh);
 		if (IsValid(NewAnimClass))
 		{
-			SkeletalMesh->SetAnimInstanceClass(NewAnimClass);
+			HeldSkeletalMesh->SetAnimInstanceClass(NewAnimClass);
 		}
 	}
 
@@ -57,6 +88,8 @@ void AMLSCharacter::AttachToHand(UStaticMesh* NewStaticMesh, USkeletalMesh* NewS
 	{
 		AttachBone = TEXT("VB RHS_ik_hand_gun");
 	}
+
+	FAttachmentTransformRules NewRule(EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, EAttachmentRule::SnapToTarget, true);
 
 	HeldObjectRoot->AttachToComponent(GetMesh(),
 	                                  FAttachmentTransformRules::SnapToTargetNotIncludingScale, AttachBone);
@@ -86,7 +119,12 @@ FVector AMLSCharacter::GetFirstPersonCameraTarget()
 void AMLSCharacter::OnOverlayStateChanged(ECharacterOverlayState PreviousState)
 {
 	Super::OnOverlayStateChanged(PreviousState);
-	UpdateHeldObject();
+
+	// Only update held object if we are not transitioning from weapons to other state
+	if (PreviousState != ECharacterOverlayState::Pistol)
+	{
+		UpdateHeldObject();
+	}
 }
 
 void AMLSCharacter::Tick(float DeltaTime)
@@ -99,6 +137,11 @@ void AMLSCharacter::Tick(float DeltaTime)
 void AMLSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SkeletaMeshObject = HeldSkeletalMesh;
+
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepWorld, EAttachmentRule::KeepWorld, true);
+	PistolAttachmentMesh->AttachToComponent(GetMesh(), AttachmentRules, FName(TEXT("Pistol_Attachment")));
 
 	UpdateHeldObject();
 }

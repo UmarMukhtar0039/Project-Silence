@@ -1,7 +1,3 @@
-
-
-
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -22,6 +18,14 @@ public:
 	/** Implemented on BP to update held objects */
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "MLS|HeldObject")
 	void UpdateHeldObject();
+
+	void EquipItem() override;
+
+	UFUNCTION()
+	void EquipGunEventUpdateVisibility();
+
+	UFUNCTION()
+	void HolsterGunEventUpdateVisibility();
 
 	UFUNCTION(BlueprintCallable, Category = "MLS|HeldObject")
 	void ClearHeldObject();
@@ -52,10 +56,22 @@ public:
 	TObjectPtr<USceneComponent> HeldObjectRoot = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MLS|Component")
-	TObjectPtr<USkeletalMeshComponent> SkeletalMesh = nullptr;
+	TObjectPtr<USkeletalMeshComponent> HeldSkeletalMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MLS|Component")
-	TObjectPtr<UStaticMeshComponent> StaticMesh = nullptr;
+	TObjectPtr<UStaticMeshComponent> HeldStaticMesh = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MLS|Component|Weapons")
+	TObjectPtr<UStaticMeshComponent> PistolSkeletalRoot = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MLS|Component|Weapons")
+	TObjectPtr<UStaticMeshComponent> PistolAttachmentMesh = nullptr;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MLS|Component|Weapons")
+	TObjectPtr<USkeletalMeshComponent> PistolSkeletalMesh = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MLS|Component")
+	TObjectPtr<USkeletalMeshComponent> SkeletaMeshObject = nullptr;
 
 private:
 	bool bNeedsColorReset = false;

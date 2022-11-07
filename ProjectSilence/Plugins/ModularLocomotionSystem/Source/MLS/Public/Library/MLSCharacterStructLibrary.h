@@ -1,7 +1,3 @@
-
-
-
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -20,6 +16,7 @@ class UNiagaraSystem;
 class UMaterialInterface;
 class USoundBase;
 class UPrimitiveComponent;
+class USoundCue;
 
 USTRUCT(BlueprintType)
 struct FCharacterComponentAndTransform
@@ -230,4 +227,48 @@ struct FMLSHitFX : public FTableRowBase
 
 	UPROPERTY(EditAnywhere, Category = "Niagara")
 	FRotator NiagaraRotationOffset;
+};
+
+
+USTRUCT(BlueprintType)
+struct FPistolAssetSetting : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	FName Name;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	TEnumAsByte<EPistolModel> EnumState;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	TObjectPtr<USkeletalMesh> SkeletaMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	TObjectPtr<UPhysicsAsset> PhysicsAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	TObjectPtr<UStaticMesh> MagazineMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	FName MagazineSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	FName MuzzleSocketName;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	TObjectPtr<USoundCue> ShootingSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	float DamageStrength;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	int32 MaxAmmoCount;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	float ShootingSpeed;
+
+	// This is required to reference the AnimInstace class in Blueprints.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	TObjectPtr<UAnimBlueprintGeneratedClass> AnimBlueprint;
 };

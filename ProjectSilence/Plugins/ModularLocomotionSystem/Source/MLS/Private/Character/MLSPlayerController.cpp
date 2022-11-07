@@ -1,7 +1,3 @@
-
-
-
-
 #include "Character/MLSPlayerController.h"
 
 #include "EnhancedInputComponent.h"
@@ -153,6 +149,14 @@ void AMLSPlayerController::AimAction(const FInputActionValue& Value)
 	if (PossessedCharacter)
 	{
 		PossessedCharacter->AimAction(Value.Get<bool>());
+	}
+}
+
+void AMLSPlayerController::ShootAction(const FInputActionValue& Value)
+{
+	if (PossessedCharacter)
+	{
+		PossessedCharacter->ShootAction();
 	}
 }
 

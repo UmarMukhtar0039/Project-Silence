@@ -1,15 +1,9 @@
-
-
-
-
 #include "Character/MLSBaseCharacter.h"
-
 
 #include "Character/Animation/MLSCharacterAnimInstance.h"
 #include "Character/Animation/MLSPlayerCameraBehavior.h"
 #include "Library/MLSMathLibrary.h"
 #include "Components/ALSDebugComponent.h"
-
 #include "Components/CapsuleComponent.h"
 #include "Curves/CurveFloat.h"
 #include "Character/MLSCharacterMovementComponent.h"
@@ -18,7 +12,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "Character/MLSPlayerCameraManager.h"
-
+#include "Kismet/DataTableFunctionLibrary.h"
+#include "Sound/SoundCue.h"
 
 const FName NAME_FP_Camera(TEXT("FP_Camera"));
 const FName NAME_Pelvis(TEXT("Pelvis"));
@@ -54,8 +49,6 @@ void AMLSBaseCharacter::PlayMontage_Implementation(UAnimMontage* Montage, float 
 	}
 }
 
-
-
 void AMLSBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -65,6 +58,9 @@ void AMLSBaseCharacter::BeginPlay()
 
 	// Set the Movement Model
 	SetMovementModel();
+
+	// Setup a default pistol asset
+	UpdatePistolAsset(Pistol_M9);
 
 	// Force update states to use the initial desired values.
 	ForceUpdateCharacterState();
@@ -196,7 +192,45 @@ void AMLSBaseCharacter::SetOverlayState(const ECharacterOverlayState NewState, b
 		const ECharacterOverlayState Prev = OverlayState;
 		OverlayState = NewState;
 		OnOverlayStateChanged(Prev);
+
+
 	}
+}
+
+void AMLSBaseCharacter::EquipItem()
+{
+}
+
+FPistolAssetSetting AMLSBaseCharacter::GetCurrentPistolAsset()
+{
+	/*TArray<FName> OutRowNames;
+	UDataTableFunctionLibrary::GetDataTableRowNames(PistolAssetDT, OutRowNames);
+
+	FName Row = OutRowNames[PistolModelIndex];
+
+	const FString ContextString = GetFullName();
+
+	FPistolAssetSetting* OutRow = PistolAssetDT->FindRow<FPistolAssetSetting>(Row, ContextString);
+	check(OutRow);
+
+	PistolAssetSettings = *OutRow;*/
+
+	return PistolAssetSettings;
+}
+
+void AMLSBaseCharacter::UpdatePistolAsset(EPistolModel NewPistolModel)
+{
+	TArray<FName> OutRowNames;
+	UDataTableFunctionLibrary::GetDataTableRowNames(PistolAssetDT, OutRowNames);
+
+	FName Row = OutRowNames[NewPistolModel];
+
+	const FString ContextString = GetFullName();
+
+	FPistolAssetSetting* OutRow = PistolAssetDT->FindRow<FPistolAssetSetting>(Row, ContextString);
+	check(OutRow);
+
+	PistolAssetSettings = *OutRow;
 }
 
 void AMLSBaseCharacter::SetActorLocationAndTargetRotation(FVector NewLocation, FRotator NewRotation)
@@ -721,6 +755,30 @@ void AMLSBaseCharacter::AimAction_Implementation(bool bValue)
 		}
 	}
 }
+
+void AMLSBaseCharacter::ShootAction_Implementation()
+{
+	// Only shoot if character is aiming
+	if (OverlayState == ECharacterOverlayState::Pistol && RotationMode == ECharacterRotationMode::Aiming)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
+		
+		PlayShootSoundByWeaponType();
+
+		/*FVector TraceStart;
+		FVector TraceEnd;
+		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectToQuery = { EObjectTypeQuery::ObjectTypeQuery1, EObjectTypeQuery::ObjectTypeQuery2 ,EObjectTypeQuery::ObjectTypeQuery4 };
+		FHitResult HitResult;
+		UKismetSystemLibrary::LineTraceSingleForObjects(this, TraceStart, TraceEnd, ObjectToQuery, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, HitResult, true);*/
+	}
+}
+
+void AMLSBaseCharacter::PlayShootSoundByWeaponType()
+{
+	USoundCue* SoundToPlay = PistolAssetSettings.ShootingSound;
+	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
+}
+
 
 void AMLSBaseCharacter::CameraTapAction_Implementation()
 {

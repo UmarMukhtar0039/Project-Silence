@@ -88,6 +88,35 @@ public:
 	UFUNCTION(BlueprintGetter, Category = "MLS|Character States")
 	ECharacterOverlayState GetOverlayState() const { return OverlayState; }
 
+	/** Equip Items */
+
+	UFUNCTION(BlueprintCallable, Category = "MLS|Items")
+	virtual void EquipItem();
+
+	/** Weapon System */
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MLS|Weapon System")
+	UDataTable* PistolAssetDT;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MLS|Weapon System")
+	FPistolAssetSetting	PistolAssetSettings;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MLS|Weapon System")
+	ECharacterCombatState CombatState = ECharacterCombatState::NONE;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "MLS|Weapon System")
+	TEnumAsByte<EPistolModel> PistolModelIndex = EPistolModel::Pistol_M9;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "MLS|Weapon System")
+	FPistolAssetSetting GetCurrentPistolAsset();
+
+	// Always call this function when a new weapon is picked up
+	UFUNCTION(BlueprintCallable, Category = "MLS|Weapon System")
+	void UpdatePistolAsset(EPistolModel NewPistolModel);
+
+	// Sound
+	UFUNCTION(BlueprintCallable, Category = "MLS|Sounds")
+	void PlayShootSoundByWeaponType();
 
 	/** Input */
 
@@ -202,6 +231,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MLS|Input")
 	void AimAction(bool bValue);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MLS|Input")
+	void ShootAction();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MLS|Input")
 	void CameraTapAction();
