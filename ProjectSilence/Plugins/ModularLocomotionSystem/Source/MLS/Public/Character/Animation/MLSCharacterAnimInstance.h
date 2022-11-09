@@ -4,6 +4,7 @@
 #include "Animation/AnimInstance.h"
 #include "Library/MLSAnimationStructLibrary.h"
 #include "Library/MLSStructEnumLibrary.h"
+#include "Interfaces/AnimationInterface.h"
 
 #include "MLSCharacterAnimInstance.generated.h"
 
@@ -18,7 +19,7 @@ class UCurveVector;
  * Main anim instance class for character
  */
 UCLASS(Blueprintable, BlueprintType)
-class MLS_API UMLSCharacterAnimInstance : public UAnimInstance
+class MLS_API UMLSCharacterAnimInstance : public UAnimInstance, public IAnimationInterface
 {
 	GENERATED_BODY()
 
@@ -40,6 +41,10 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "MLS|Event")
 	void OnPivot();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "MLS|Animation|Weapon")
+	void ShootingAddRecoil(EWeaponType WeaponType, float RecoilStrength, float RecoilStartDelay, float RecoilEndDelay);
+	virtual void ShootingAddRecoil_Implementation(EWeaponType WeaponType, float RecoilStrength, float RecoilStartDelay, float RecoilEndDelay) override; // the actual implemention that will be called
 
 protected:
 
@@ -133,6 +138,12 @@ private:
 
 	ECharacterMovementDirection CalculateMovementDirection() const;
 
+	/** Recoil */
+
+	void OnRecoilWithDelay();
+
+	void OnRecoilStopDelay();
+
 	/** Util */
 
 	float GetAnimCurveClamped(const FName& Name, float Bias, float ClampMin, float ClampMax) const;
@@ -219,7 +230,17 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Character Information")
 	bool bHolsterFinishedPlaying = false;
+	
+	/** Recoil */
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Recoil")
+	float RecoilStrengthBody = 0.0f;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Recoil")
+	float RecoilStrengthArms = 0.0f;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Read Only Data|Recoil")
+	bool bAddRecoilImpulse = false;
+	
 	/** Blend Curves */
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Configuration|Blend Curves")
@@ -260,8 +281,17 @@ private:
 
 	FTimerHandle OnJumpedTimer;
 
+	FTimerHandle RecoilStartTimer;
+
+	FTimerHandle RecoilEndTimer;
+
 	bool bCanPlayDynamicTransition = true;
 
 	UPROPERTY()
 	TObjectPtr<UALSDebugComponent> ALSDebugComponent = nullptr;
+
+	float ShootingTime = 0.0f;
+	float ShootingTimerInterp = 0.0f;
+	float PlayRecoil = 0.0f;
+	float RecoilImpulseInterp = 0.0f;
 };

@@ -59,8 +59,11 @@ void AMLSFixedCamera::BeginPlay()
 
 	AMLSPlayerCameraManager* PlayerCameraManager = Cast<AMLSPlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0));
 	
-	// Adds this camera to player cam manager to keep track of all the cameras we have in this level.
-	PlayerCameraManager->AddFixedCamera(this);
+	if (PlayerCameraManager)
+	{
+		// Adds this camera to player cam manager to keep track of all the cameras we have in this level.
+		PlayerCameraManager->AddFixedCamera(this);
+	}
 }
 
 void AMLSFixedCamera::OnActivateBoxBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)

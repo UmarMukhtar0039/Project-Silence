@@ -792,5 +792,47 @@ void UMLSCharacterAnimInstance::OnPivot()
 {
 	Grounded.bPivot = CharacterInformation.Speed < Config.TriggerPivotSpeedLimit;
 	GetWorld()->GetTimerManager().SetTimer(OnPivotTimer, this,
-	                                  &UMLSCharacterAnimInstance::OnPivotDelay, 0.1f, false);
+										   &UMLSCharacterAnimInstance::OnPivotDelay, 0.1f, false);
+}
+
+void UMLSCharacterAnimInstance::ShootingAddRecoil_Implementation(EWeaponType WeaponType, 
+																 float RecoilStrength, 
+																 float RecoilStartDelay, 
+																 float RecoilEndDelay)
+{
+	switch (WeaponType)
+	{
+		case EWeaponType::Pistol2H:
+		{
+			RecoilStrengthBody = RecoilStrength * 0.8;
+			RecoilStrengthArms = RecoilStrength;
+			break;
+		}
+	}
+
+	// TODO: Get the recoil start delay time from the character
+
+	GetWorld()->GetTimerManager().SetTimer(RecoilStartTimer, this,
+										   &UMLSCharacterAnimInstance::OnRecoilWithDelay, 0.01f, false);
+}
+
+
+void UMLSCharacterAnimInstance::OnRecoilWithDelay()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Shooting recoil"));
+
+	bAddRecoilImpulse = true;
+	
+	// TODO: Get the recoil stop delay time from the character
+	// 
+	// Timer to remove the recoil effect.
+	GetWorld()->GetTimerManager().SetTimer(RecoilEndTimer, this,
+										   &UMLSCharacterAnimInstance::OnRecoilStopDelay, 0.08f, false);
+}
+
+void UMLSCharacterAnimInstance::OnRecoilStopDelay()
+{
+	bAddRecoilImpulse = false;
+	RecoilStrengthBody = 0.0f;
+	RecoilStrengthArms = 0.0f;
 }

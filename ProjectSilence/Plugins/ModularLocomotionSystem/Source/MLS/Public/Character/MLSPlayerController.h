@@ -49,7 +49,7 @@ protected:
 	void AimAction(const FInputActionValue& Value);
 	
 	UFUNCTION()
-	void ShootAction(const FInputActionValue& Value);
+	void LMBDown(const FInputActionValue& Value);
 
 	UFUNCTION()
 	void CameraTapAction(const FInputActionValue& Value);

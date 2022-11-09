@@ -269,7 +269,6 @@ bool AMLSPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& Loc
 	}
 
 	// Step 1: Get Camera Parameters from CharacterBP via the Camera Interface
-	const FVector& FPTarget = ControlledCharacter->GetFirstPersonCameraTarget();
 	float TPFOV = 90.0f;
 	float FCFOV = 90.0f;
 	bool bRightShoulder = false;
@@ -394,17 +393,13 @@ bool AMLSPlayerCameraManager::CustomCameraBehavior(float DeltaTime, FVector& Loc
 		                                               5.0f);
 	}
 
-	if (HitResult.IsValidBlockingHit())
+	// TODO: Do you wanna consider spring arm collision effect?
+	/*if (HitResult.IsValidBlockingHit())
 	{
 		TargetCameraLocation += HitResult.Location - HitResult.TraceEnd;
-	}
+	}*/
 
-	// Step 8: Lerp First Person Override and return target camera parameters.
-	FTransform TargetCameraTransform(TargetCameraRotation, TargetCameraLocation, FVector::OneVector);
-	FTransform FPTargetCameraTransform(TargetCameraRotation, FPTarget, FVector::OneVector);
-
-	//const FTransform& TargetTransform = UKismetMathLibrary::TLerp(TargetCameraTransform, FTransform(DebugViewRotation, TargetCameraLocation, FVector::OneVector), GetCameraBehaviorParam(NAME_Override_Debug));
-	const FTransform& TargetTransform = TargetCameraTransform;
+	const FTransform TargetTransform(TargetCameraRotation, TargetCameraLocation, FVector::OneVector);
 
 	Location = TargetTransform.GetLocation();
 	Rotation = TargetTransform.Rotator();

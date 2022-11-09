@@ -1,6 +1,5 @@
 #include "Character/MLSBaseCharacter.h"
 
-#include "Character/Animation/MLSCharacterAnimInstance.h"
 #include "Character/Animation/MLSPlayerCameraBehavior.h"
 #include "Library/MLSMathLibrary.h"
 #include "Components/ALSDebugComponent.h"
@@ -11,9 +10,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
-#include "Character/MLSPlayerCameraManager.h"
 #include "Kismet/DataTableFunctionLibrary.h"
-#include "Sound/SoundCue.h"
+#include "Character/MLSPlayerCameraManager.h"
+
 
 const FName NAME_FP_Camera(TEXT("FP_Camera"));
 const FName NAME_Pelvis(TEXT("Pelvis"));
@@ -59,9 +58,6 @@ void AMLSBaseCharacter::BeginPlay()
 	// Set the Movement Model
 	SetMovementModel();
 
-	// Setup a default pistol asset
-	UpdatePistolAsset(Pistol_M9);
-
 	// Force update states to use the initial desired values.
 	ForceUpdateCharacterState();
 
@@ -105,10 +101,7 @@ void AMLSBaseCharacter::Tick(float DeltaTime)
 	// Cache values
 	PreviousVelocity = GetVelocity();
 	PreviousAimYaw = AimingRotation.Yaw;
-
-	FVector LineStart = GetActorLocation();
-	FVector LineEnd = LineStart + (GetControlRotation().Vector() * 100.0f);
-	DrawDebugDirectionalArrow(GetWorld(), LineStart, LineEnd, 100.f, FColor::Green, false, 0.f, 0, 5.0f);
+	
 }
 
 void AMLSBaseCharacter::SetMovementState(const ECharacterMovementState NewState, bool bForce)
@@ -201,38 +194,6 @@ void AMLSBaseCharacter::EquipItem()
 {
 }
 
-FPistolAssetSetting AMLSBaseCharacter::GetCurrentPistolAsset()
-{
-	/*TArray<FName> OutRowNames;
-	UDataTableFunctionLibrary::GetDataTableRowNames(PistolAssetDT, OutRowNames);
-
-	FName Row = OutRowNames[PistolModelIndex];
-
-	const FString ContextString = GetFullName();
-
-	FPistolAssetSetting* OutRow = PistolAssetDT->FindRow<FPistolAssetSetting>(Row, ContextString);
-	check(OutRow);
-
-	PistolAssetSettings = *OutRow;*/
-
-	return PistolAssetSettings;
-}
-
-void AMLSBaseCharacter::UpdatePistolAsset(EPistolModel NewPistolModel)
-{
-	TArray<FName> OutRowNames;
-	UDataTableFunctionLibrary::GetDataTableRowNames(PistolAssetDT, OutRowNames);
-
-	FName Row = OutRowNames[NewPistolModel];
-
-	const FString ContextString = GetFullName();
-
-	FPistolAssetSetting* OutRow = PistolAssetDT->FindRow<FPistolAssetSetting>(Row, ContextString);
-	check(OutRow);
-
-	PistolAssetSettings = *OutRow;
-}
-
 void AMLSBaseCharacter::SetActorLocationAndTargetRotation(FVector NewLocation, FRotator NewRotation)
 {
 	SetActorLocationAndRotation(NewLocation, NewRotation);
@@ -246,6 +207,22 @@ void AMLSBaseCharacter::SetMovementModel()
 		MovementModel.DataTable->FindRow<FMovementStateSettings>(MovementModel.RowName, ContextString);
 	check(OutRow);
 	MovementData = *OutRow;
+}
+
+void AMLSBaseCharacter::GetHitFxInfoBySurfaceType(const EPhysicalSurface& SurfaceType, FMLSHitFX& OutHitImpactFX)
+{
+	TArray<FName> OutRowNames;
+	UDataTableFunctionLibrary::GetDataTableRowNames(HitImpactFXDT, OutRowNames);
+	
+	UE_LOG(LogTemp, Warning, TEXT("Surface type is %d"), SurfaceType);
+	FName Row = OutRowNames[SurfaceType - 1];
+
+	const FString ContextString = GetFullName();
+
+	const FMLSHitFX* OutRow = HitImpactFXDT->FindRow<FMLSHitFX>(Row, ContextString);
+	check(OutRow);
+
+	OutHitImpactFX = *OutRow;
 }
 
 void AMLSBaseCharacter::ForceUpdateCharacterState()
@@ -342,11 +319,6 @@ ECollisionChannel AMLSBaseCharacter::GetThirdPersonTraceParams(FVector& TraceOri
 FTransform AMLSBaseCharacter::GetThirdPersonPivotTarget()
 {
 	return GetActorTransform();
-}
-
-FVector AMLSBaseCharacter::GetFirstPersonCameraTarget()
-{
-	return GetMesh()->GetSocketLocation(NAME_FP_Camera);
 }
 
 void AMLSBaseCharacter::GetCameraParameters(float& TPFOVOut, bool& bRightShoulderOut) const
@@ -755,30 +727,6 @@ void AMLSBaseCharacter::AimAction_Implementation(bool bValue)
 		}
 	}
 }
-
-void AMLSBaseCharacter::ShootAction_Implementation()
-{
-	// Only shoot if character is aiming
-	if (OverlayState == ECharacterOverlayState::Pistol && RotationMode == ECharacterRotationMode::Aiming)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Shoot"));
-		
-		PlayShootSoundByWeaponType();
-
-		/*FVector TraceStart;
-		FVector TraceEnd;
-		TArray<TEnumAsByte<EObjectTypeQuery>> ObjectToQuery = { EObjectTypeQuery::ObjectTypeQuery1, EObjectTypeQuery::ObjectTypeQuery2 ,EObjectTypeQuery::ObjectTypeQuery4 };
-		FHitResult HitResult;
-		UKismetSystemLibrary::LineTraceSingleForObjects(this, TraceStart, TraceEnd, ObjectToQuery, false, TArray<AActor*>(), EDrawDebugTrace::ForOneFrame, HitResult, true);*/
-	}
-}
-
-void AMLSBaseCharacter::PlayShootSoundByWeaponType()
-{
-	USoundCue* SoundToPlay = PistolAssetSettings.ShootingSound;
-	UGameplayStatics::SpawnSoundAtLocation(GetWorld(), SoundToPlay, GetActorLocation());
-}
-
 
 void AMLSBaseCharacter::CameraTapAction_Implementation()
 {

@@ -146,3 +146,13 @@ enum class EWeaponType : uint8
 	Pistol2H,
 	Rifle,
 };
+
+UENUM(BlueprintType)
+enum class EWeaponState : uint8
+{
+	Ready,
+	FireTimerInProgress,
+	Reloading,
+	Shooting,
+};
+

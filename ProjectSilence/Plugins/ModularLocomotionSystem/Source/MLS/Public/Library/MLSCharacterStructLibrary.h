@@ -17,6 +17,7 @@ class UMaterialInterface;
 class USoundBase;
 class UPrimitiveComponent;
 class USoundCue;
+class UParticleSystem;
 
 USTRUCT(BlueprintType)
 struct FCharacterComponentAndTransform
@@ -214,7 +215,7 @@ struct FMLSHitFX : public FTableRowBase
 	FRotator DecalRotationOffset;
 
 	UPROPERTY(EditAnywhere, Category = "Niagara")
-	TSoftObjectPtr<UNiagaraSystem> NiagaraSystem;
+	TSoftObjectPtr<UParticleSystem> NiagaraSystem;
 
 	UPROPERTY(EditAnywhere, Category = "Niagara")
 	ECharacterSpawnType NiagaraSpawnType;
@@ -239,16 +240,16 @@ struct FPistolAssetSetting : public FTableRowBase
 	FName Name;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
-	TEnumAsByte<EPistolModel> EnumState;
+	TEnumAsByte<EPistolModel> PistolModel = EPistolModel::Pistol_M9;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
-	TObjectPtr<USkeletalMesh> SkeletaMesh;
+	TObjectPtr<USkeletalMesh> SkeletaMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
-	TObjectPtr<UPhysicsAsset> PhysicsAsset;
+	TObjectPtr<UPhysicsAsset> PhysicsAsset = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
-	TObjectPtr<UStaticMesh> MagazineMesh;
+	TObjectPtr<UStaticMesh> MagazineMesh = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
 	FName MagazineSocketName;
@@ -257,7 +258,7 @@ struct FPistolAssetSetting : public FTableRowBase
 	FName MuzzleSocketName;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
-	TObjectPtr<USoundCue> ShootingSound;
+	TObjectPtr<USoundCue> ShootingSound = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
 	float DamageStrength;
@@ -270,5 +271,5 @@ struct FPistolAssetSetting : public FTableRowBase
 
 	// This is required to reference the AnimInstace class in Blueprints.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
-	TObjectPtr<UAnimBlueprintGeneratedClass> AnimBlueprint;
+	TObjectPtr<UAnimBlueprintGeneratedClass> AnimBlueprint = nullptr;
 };

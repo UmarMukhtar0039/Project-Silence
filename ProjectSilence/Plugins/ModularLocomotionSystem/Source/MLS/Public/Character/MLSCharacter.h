@@ -4,6 +4,8 @@
 #include "Character/MLSBaseCharacter.h"
 #include "MLSCharacter.generated.h"
 
+class UMLSSoundControllerComponent;
+
 /**
  * Specialized character class, with additional features like held object etc.
  */
@@ -21,12 +23,6 @@ public:
 
 	void EquipItem() override;
 
-	UFUNCTION()
-	void EquipGunEventUpdateVisibility();
-
-	UFUNCTION()
-	void HolsterGunEventUpdateVisibility();
-
 	UFUNCTION(BlueprintCallable, Category = "MLS|HeldObject")
 	void ClearHeldObject();
 
@@ -38,7 +34,46 @@ public:
 
 	virtual FTransform GetThirdPersonPivotTarget() override;
 
-	virtual FVector GetFirstPersonCameraTarget() override;
+	// NOTE: Only the main character will have weapon.
+	/** Weapon System */
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "MLS|Weapon System|Pistol")
+	UDataTable* PistolAssetDT;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = "MLS|Weapon System|Pistol")
+	ECharacterCombatState CombatState = ECharacterCombatState::NONE;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "MLS|Weapon System|Pistol")
+	TEnumAsByte<EPistolModel> PistolModelIndex = EPistolModel::Pistol_M9;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "MLS|Weapon System|Pistol")
+	FORCEINLINE FPistolAssetSetting GetCurrentPistolAsset() { return CurrentPistolAsset; }
+
+	// Always call this function when a new weapon is picked up
+	UFUNCTION(BlueprintCallable, Category = "MLS|Weapon System|Pistol")
+	void UpdatePistolAsset(EPistolModel NewPistolModel);
+
+	UFUNCTION()
+	void EquipGunEventUpdateVisibility();
+
+	UFUNCTION()
+	void HolsterGunEventUpdateVisibility();
+
+	// Sound
+	UFUNCTION(BlueprintCallable, Category = "MLS|Sounds")
+	void PlayShootSoundByWeaponType();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MLS|Input")
+	void LMBDown();
+
+	UFUNCTION(BlueprintCallable, Category = "MLS|Weapon")
+	bool CanFireGun();
+
+	UFUNCTION(BlueprintCallable, Category = "MLS|Weapon")
+	void FireGun();
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MLS|Weapon")
+	void OnBulletHitImpact(const FHitResult& HitResult);
 
 protected:
 	virtual void Tick(float DeltaTime) override;
@@ -74,5 +109,17 @@ public:
 	TObjectPtr<USkeletalMeshComponent> SkeletaMeshObject = nullptr;
 
 private:
+
+	// TODO: Attach the blueprint version of this?
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "MLS|SoundSystem")
+	UMLSSoundControllerComponent* SoundController;
+
+	UPROPERTY(VisibleAnywhere, Category = "MLS|Weapon System")
+	FPistolAssetSetting	CurrentPistolAsset;
+
+	UPROPERTY(VisibleAnywhere, Category = "MLS|HitImpactDetails")
+	FMLSHitFX HitImpactFX;
+	
 	bool bNeedsColorReset = false;
+
 };

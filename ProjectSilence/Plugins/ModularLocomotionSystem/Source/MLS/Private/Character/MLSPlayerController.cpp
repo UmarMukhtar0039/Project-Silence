@@ -152,11 +152,13 @@ void AMLSPlayerController::AimAction(const FInputActionValue& Value)
 	}
 }
 
-void AMLSPlayerController::ShootAction(const FInputActionValue& Value)
+void AMLSPlayerController::LMBDown(const FInputActionValue& Value)
 {
-	if (PossessedCharacter)
+	// Shooting can only be done by playable character
+	AMLSCharacter* PlayableCharacter = Cast<AMLSCharacter>(PossessedCharacter);
+	if (PlayableCharacter)
 	{
-		PossessedCharacter->ShootAction();
+		PlayableCharacter->LMBDown();
 	}
 }
 
