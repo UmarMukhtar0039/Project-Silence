@@ -42,7 +42,6 @@ void AMLSFixedCamera::BeginPlay()
 {
 	Super::BeginPlay();
 
-
 	// Get all child components
 	TArray<USceneComponent*> AllChildren;
 	RootComponent->GetChildrenComponents(false, AllChildren);
@@ -57,6 +56,7 @@ void AMLSFixedCamera::BeginPlay()
 		//Child->SetWorldTransform(CurrentWorldTransform);
 	}
 
+	// TODO: Probably do this with an interface?
 	AMLSPlayerCameraManager* PlayerCameraManager = Cast<AMLSPlayerCameraManager>(UGameplayStatics::GetPlayerCameraManager(GetWorld(), 0));
 	
 	if (PlayerCameraManager)

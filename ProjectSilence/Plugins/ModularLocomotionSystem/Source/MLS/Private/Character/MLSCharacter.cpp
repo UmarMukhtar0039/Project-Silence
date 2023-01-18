@@ -12,6 +12,8 @@
 #include "Interfaces/AnimationInterface.h"
 #include "Components/MLSSoundControllerComponent.h"
 #include "Particles/ParticleSystem.h"
+#include "TimerManager.h"
+#include "Actors/MLSItem.h"
 
 AMLSCharacter::AMLSCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -50,15 +52,21 @@ void AMLSCharacter::BeginPlay()
 
 	UpdateHeldObject();
 
-	// Setup a default pistol asset
-	UpdatePistolAsset(PistolModelIndex);
-
+	InitAmmoMap();
 }
 
 void AMLSCharacter::EquipItem()
 {
 	Super::EquipItem();
 
+}
+
+void AMLSCharacter::PickupItem(AMLSItem* const Item)
+{
+	if (Item)
+	{
+		Inventory.Add(Item);
+	}
 }
 
 void AMLSCharacter::UpdatePistolAsset(EPistolModel NewPistolModel)
@@ -74,6 +82,34 @@ void AMLSCharacter::UpdatePistolAsset(EPistolModel NewPistolModel)
 	check(OutRow);
 
 	CurrentPistolAsset = *OutRow;
+
+	// Not required here as the left over ammo will already be in the AmmoMap.
+	/*if (CurrentPistolAsset.AmmoCount > 0)
+	{
+		AddAmmo(CurrentPistolAsset.AmmoType, CurrentPistolAsset.AmmoCount);
+	}*/
+
+	PistolSkeletalMesh->SetSkeletalMesh(CurrentPistolAsset.SkeletaMesh);
+}
+
+void AMLSCharacter::InitAmmoMap()
+{
+	AmmoMap.Add(EAmmoType::EAT_9MM, 1);
+}
+
+void AMLSCharacter::AddAmmo(EAmmoType AmmoType, int32 Count)
+{
+	// This will just replace the count if something is already present.
+	int32* const CurrentAmmoCount = AmmoMap.Find(AmmoType);
+
+	if (CurrentAmmoCount)
+	{
+		*CurrentAmmoCount += Count;
+	}
+	else
+	{
+		AmmoMap.Add(AmmoType, Count);
+	}
 }
 
 bool AMLSCharacter::CanFireGun()
@@ -81,8 +117,21 @@ bool AMLSCharacter::CanFireGun()
 	// TODO: need to check if the player aiming anim is complete or not.
 	// 
 	// Only shoot if character is aiming
-	if (OverlayState == ECharacterOverlayState::Pistol && RotationMode == ECharacterRotationMode::Aiming)
+	if (!bLockShooting && OverlayState == ECharacterOverlayState::Pistol &&
+		RotationMode == ECharacterRotationMode::Aiming)
 	{
+		if ( CurrentPistolAsset.AmmoCount > 0 )
+		{
+			// Automatic Reload
+			UE_LOG(LogTemp, Warning, TEXT("Reloading"));
+			return false;
+		}
+
+		// TODO: Move up perhaps? So that we lock shooting untill player is ready after reload.
+		bLockShooting = true;
+
+		GetWorld()->GetTimerManager().SetTimer(BulletShootDelayTimer, [this]() -> void { bLockShooting = false; }, CurrentPistolAsset.ShootingSpeed, false);
+
 		return true;
 	}
 
@@ -95,7 +144,6 @@ void AMLSCharacter::LMBDown_Implementation()
 	{
 		FireGun();
 	}
-
 }
 
 void AMLSCharacter::FireGun()
@@ -103,6 +151,9 @@ void AMLSCharacter::FireGun()
 	// TODO: this should be called in a play fx function
 	PlayShootSoundByWeaponType();
 	
+	// Decrement ammo in gun
+	--CurrentPistolAsset.AmmoCount;
+
 	UAnimInstance* AnimInst = GetMesh()->GetAnimInstance();
 
 	// TODO: Move this to correct function
@@ -119,7 +170,6 @@ void AMLSCharacter::FireGun()
 		IAnimationInterface::Execute_ShootingAddRecoil(AnimInst, WeaponType, RecoilStrength, RecoilStartDelay, RecoilEndDelay);
 	}
 	
-	
 	// TODO: We will first check what kind of gun is equipped
 
 	FVector TraceStart;
@@ -128,8 +178,8 @@ void AMLSCharacter::FireGun()
 	
 	// Trace type for world dynamic, world static and physics body
 	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectToQuery = { EObjectTypeQuery::ObjectTypeQuery1, 
-															EObjectTypeQuery::ObjectTypeQuery2 ,
-															EObjectTypeQuery::ObjectTypeQuery4 };
+		EObjectTypeQuery::ObjectTypeQuery2, 
+		EObjectTypeQuery::ObjectTypeQuery4 };
 	
 	if (OverlayState == ECharacterOverlayState::Pistol)
 	{
@@ -215,7 +265,6 @@ void AMLSCharacter::OnBulletHitImpact_Implementation(const FHitResult& HitResult
 	{
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitImpactFX.NiagaraSystem.Get(), HitResult.Location);
 	}
-
 }
 
 void AMLSCharacter::PlayShootSoundByWeaponType()

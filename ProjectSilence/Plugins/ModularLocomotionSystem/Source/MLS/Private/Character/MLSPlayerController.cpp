@@ -210,6 +210,14 @@ void AMLSPlayerController::LookingDirectionAction(const FInputActionValue& Value
 	}
 }
 
+void AMLSPlayerController::InteractAction(const FInputActionValue& Value)
+{
+	if (PossessedCharacter && Value.Get<bool>())
+	{
+		PossessedCharacter->InteractAction();
+	}
+}
+
 void AMLSPlayerController::DebugToggleHudAction(const FInputActionValue& Value)
 {
 	if (PossessedCharacter && Value.Get<bool>())

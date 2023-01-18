@@ -67,7 +67,10 @@ protected:
 	void VelocityDirectionAction(const FInputActionValue& Value);
 
 	UFUNCTION()
-	void LookingDirectionAction(const FInputActionValue& Value);
+	void LookingDirectionAction(const FInputActionValue& Value);	
+	
+	UFUNCTION()
+	void InteractAction(const FInputActionValue& Value);
 
 	// Debug actions
 	UFUNCTION()

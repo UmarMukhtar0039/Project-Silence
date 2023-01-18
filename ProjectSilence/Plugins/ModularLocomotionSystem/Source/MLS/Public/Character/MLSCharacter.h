@@ -5,6 +5,7 @@
 #include "MLSCharacter.generated.h"
 
 class UMLSSoundControllerComponent;
+class AMLSItem;
 
 /**
  * Specialized character class, with additional features like held object etc.
@@ -22,6 +23,9 @@ public:
 	void UpdateHeldObject();
 
 	void EquipItem() override;
+
+	UFUNCTION(BlueprintCallable, Category = "MLS|Pickup System")
+	void PickupItem(AMLSItem* const Item);
 
 	UFUNCTION(BlueprintCallable, Category = "MLS|HeldObject")
 	void ClearHeldObject();
@@ -86,6 +90,11 @@ protected:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "MLS|HeldObject")
 	void UpdateHeldObjectAnimations();
 
+	void InitAmmoMap();
+
+	UFUNCTION(BlueprintCallable, Category = "MLS|HeldObject")
+	void AddAmmo(EAmmoType AmmoType, int32 Count);
+
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MLS|Component")
 	TObjectPtr<USceneComponent> HeldObjectRoot = nullptr;
@@ -110,6 +119,13 @@ public:
 
 private:
 
+	/** Items Pickup */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "MLS|Pickup System")
+	AMLSItem* ItemToPickup;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "MLS|Inventory System")
+	TArray< AMLSItem* > Inventory;
+
 	// TODO: Attach the blueprint version of this?
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, meta = (AllowPrivateAccess = true), Category = "MLS|SoundSystem")
 	UMLSSoundControllerComponent* SoundController;
@@ -120,6 +136,21 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "MLS|HitImpactDetails")
 	FMLSHitFX HitImpactFX;
 	
-	bool bNeedsColorReset = false;
+	/** Shooting related */
+	UPROPERTY()
+	FTimerHandle BulletShootDelayTimer;
 
+	UPROPERTY(VisibleAnywhere, Category = "MLS|Weapon System")
+	bool bLockShooting = false;
+
+	/** Ammo related */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess), Category = "MLS|Weapon System")
+	TMap<EAmmoType, int32> AmmoMap; // Contains total no. of all ammo types player has.
+
+	// TODO: Might not need it.
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess), Category = "MLS|Weapon System")
+	int32 TotalPistolAmmo = 9;
+
+	/** misc */
+	bool bNeedsColorReset = false;
 };

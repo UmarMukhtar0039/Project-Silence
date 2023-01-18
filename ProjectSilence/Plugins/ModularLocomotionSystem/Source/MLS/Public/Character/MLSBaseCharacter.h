@@ -215,6 +215,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MLS|Input")
 	void WalkAction();
+	
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MLS|Input")
+	void InteractAction();
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "MLS|Input")
 	void VelocityDirectionAction();

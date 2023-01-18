@@ -268,6 +268,12 @@ struct FPistolAssetSetting : public FTableRowBase
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
 	float ShootingSpeed;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	int32 AmmoCount;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")
+	EAmmoType AmmoType;
 
 	// This is required to reference the AnimInstace class in Blueprints.
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Pistol Settings")

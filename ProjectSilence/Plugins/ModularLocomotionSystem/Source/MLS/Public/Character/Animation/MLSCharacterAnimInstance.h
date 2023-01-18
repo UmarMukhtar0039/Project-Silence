@@ -290,6 +290,7 @@ private:
 	UPROPERTY()
 	TObjectPtr<UALSDebugComponent> ALSDebugComponent = nullptr;
 
+	// TODO: Need these?
 	float ShootingTime = 0.0f;
 	float ShootingTimerInterp = 0.0f;
 	float PlayRecoil = 0.0f;

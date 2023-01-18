@@ -128,7 +128,9 @@ UENUM(BlueprintType)
 enum EPistolModel
 {
 	Pistol_M9				UMETA(DisplayName = "M9"),
-	Pistol_DesertEagle		UMETA(DisplayName = "DesertEagle")
+	Pistol_DesertEagle		UMETA(DisplayName = "DesertEagle"),
+
+	NONE					UMETA(DisplayName = "NONE")
 };
 
 UENUM(BlueprintType)
@@ -143,6 +145,8 @@ enum class ECharacterCombatState : uint8
 UENUM(BlueprintType)
 enum class EWeaponType : uint8
 {
+	NONE,
+
 	Pistol2H,
 	Rifle,
 };
@@ -154,5 +158,12 @@ enum class EWeaponState : uint8
 	FireTimerInProgress,
 	Reloading,
 	Shooting,
+};
+
+UENUM(BlueprintType)
+enum class EAmmoType : uint8
+{
+	EAT_9MM,
+	EAT_Rifle
 };
 

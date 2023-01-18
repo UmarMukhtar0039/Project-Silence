@@ -9,7 +9,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
-#include "TimerManager.h"
 #include "Kismet/DataTableFunctionLibrary.h"
 #include "Character/MLSPlayerCameraManager.h"
 
@@ -809,4 +808,9 @@ void AMLSBaseCharacter::LookingDirectionAction_Implementation()
 {
 	SetDesiredRotationMode(ECharacterRotationMode::LookingDirection);
 	SetRotationMode(ECharacterRotationMode::LookingDirection);
+}
+
+void AMLSBaseCharacter::InteractAction_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Called from C++ file"));
 }
